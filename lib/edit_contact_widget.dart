@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:my_contact/contact.dart';
 
-class AddContactWidget extends StatefulWidget {
-  final Function(Contact contact) addContact;
-  const AddContactWidget({Key? key, required this.addContact})
+class EditContactWidget extends StatefulWidget {
+  final Function(Contact contact) editContact;
+  final Contact contact;
+  const EditContactWidget(
+      {Key? key, required this.contact, required this.editContact})
       : super(key: key);
 
   @override
-  _AddContactWidgetState createState() => _AddContactWidgetState();
+  _EditContactWidgetState createState() => _EditContactWidgetState();
 }
 
-class _AddContactWidgetState extends State<AddContactWidget> {
+class _EditContactWidgetState extends State<EditContactWidget> {
   final _formKey = GlobalKey<FormState>();
 
   late TextEditingController nameController;
@@ -20,9 +22,9 @@ class _AddContactWidgetState extends State<AddContactWidget> {
   @override
   void initState() {
     super.initState();
-    nameController = TextEditingController();
-    phoneController = TextEditingController();
-    emailController = TextEditingController();
+    nameController = TextEditingController(text: widget.contact.name);
+    phoneController = TextEditingController(text: widget.contact.phone);
+    emailController = TextEditingController(text: widget.contact.email);
   }
 
   @override
@@ -36,7 +38,7 @@ class _AddContactWidgetState extends State<AddContactWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Add New Contact')),
+      appBar: AppBar(title: Text('Edit New Contact')),
       body: Form(
         key: _formKey,
         child: ListView(
@@ -82,8 +84,8 @@ class _AddContactWidgetState extends State<AddContactWidget> {
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
                     Navigator.pop(context);
-                    widget.addContact(Contact(
-                        id: -1,
+                    widget.editContact(Contact(
+                        id: widget.contact.id,
                         name: nameController.text,
                         phone: phoneController.text,
                         email: emailController.text));
@@ -91,7 +93,7 @@ class _AddContactWidgetState extends State<AddContactWidget> {
                         .showSnackBar(SnackBar(content: Text('Process Data')));
                   }
                 },
-                child: Text('Add Contact'))
+                child: Text('Edit Contact'))
           ],
         ),
       ),
