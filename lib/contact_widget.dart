@@ -46,9 +46,15 @@ class _ContactWidgetState extends State<ContactWidget> {
     });
   }
 
-  void editContact(contact, index) {
+  void editContact(Contact contact, int index) {
     setState(() {
       contacts[index] = contact;
+    });
+  }
+
+  void deleteContact(index) {
+    setState(() {
+      contacts.removeAt(index);
     });
   }
 
@@ -69,20 +75,32 @@ class _ContactWidgetState extends State<ContactWidget> {
               ],
             ),
             trailing: IconButton(
-              icon: Icon(Icons.edit),
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => EditContactWidget(
-                            contact: contacts[index],
-                            editContact: (contact) {
-                              setState(() {
-                                contacts[index] = contact;
-                              });
-                            })));
-              },
-            ),
+                icon: Icon(Icons.delete),
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: Text('Delete Contact'),
+                        content: Text(
+                            'Are you sure you want to delete this contact?'),
+                        actions: [
+                          TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: Text('Cancel')),
+                          TextButton(
+                              onPressed: () {
+                                deleteContact(index);
+                                Navigator.pop(context);
+                              },
+                              child: Text('Delete'))
+                        ],
+                      );
+                    },
+                  );
+                }),
             onTap: () {
               Navigator.push(
                   context,
@@ -90,9 +108,7 @@ class _ContactWidgetState extends State<ContactWidget> {
                       builder: (context) => EditContactWidget(
                           contact: contacts[index],
                           editContact: (contact) {
-                            setState(() {
-                              contacts[index] = contact;
-                            });
+                            editContact(contact, index);
                           })));
             },
           );
