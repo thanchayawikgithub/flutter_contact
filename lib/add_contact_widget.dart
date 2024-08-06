@@ -79,19 +79,20 @@ class _AddContactWidgetState extends State<AddContactWidget> {
             ),
             SizedBox(height: 16),
             ElevatedButton(
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    Navigator.pop(context);
-                    widget.addContact(Contact(
-                        id: -1,
-                        name: nameController.text,
-                        phone: phoneController.text,
-                        email: emailController.text));
-                    ScaffoldMessenger.of(context)
-                        .showSnackBar(SnackBar(content: Text('Process Data')));
-                  }
-                },
-                child: Text('Add Contact'))
+              onPressed: () {
+                if (_formKey.currentState!.validate()) {
+                  Navigator.pop(context);
+                  widget.addContact(Contact(
+                      id: -1,
+                      name: nameController.text,
+                      phone: phoneController.text,
+                      email: emailController.text));
+                  ScaffoldMessenger.of(context)
+                      .showSnackBar(SnackBar(content: Text('Process Data')));
+                }
+              },
+              child: Text('Add Contact'),
+            ),
           ],
         ),
       ),
