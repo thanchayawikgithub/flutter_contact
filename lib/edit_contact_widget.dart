@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:my_contact/contact.dart';
+import 'package:my_contact/contact_provider.dart';
+import 'package:provider/provider.dart';
 
 class EditContactWidget extends StatefulWidget {
-  final Function(Contact contact) editContact;
-  final Contact contact;
-  const EditContactWidget(
-      {Key? key, required this.contact, required this.editContact})
-      : super(key: key);
+  const EditContactWidget({Key? key}) : super(key: key);
 
   @override
   _EditContactWidgetState createState() => _EditContactWidgetState();
@@ -22,9 +20,12 @@ class _EditContactWidgetState extends State<EditContactWidget> {
   @override
   void initState() {
     super.initState();
-    nameController = TextEditingController(text: widget.contact.name);
-    phoneController = TextEditingController(text: widget.contact.phone);
-    emailController = TextEditingController(text: widget.contact.email);
+    final provider = Provider.of<ContactProvider>(context, listen: false);
+    nameController = TextEditingController(text: provider.currentContact.name);
+    phoneController =
+        TextEditingController(text: provider.currentContact.phone);
+    emailController =
+        TextEditingController(text: provider.currentContact.email);
   }
 
   @override
@@ -83,12 +84,15 @@ class _EditContactWidgetState extends State<EditContactWidget> {
             ElevatedButton(
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
+                    final provider =
+                        Provider.of<ContactProvider>(context, listen: false);
                     Navigator.pop(context);
-                    widget.editContact(Contact(
-                        id: widget.contact.id,
+                    Contact currentContact = provider.currentContact.copyWith(
                         name: nameController.text,
                         phone: phoneController.text,
-                        email: emailController.text));
+                        email: emailController.text);
+                    provider.setCurrentContact(currentContact);
+                    provider.saveContact();
                     ScaffoldMessenger.of(context)
                         .showSnackBar(SnackBar(content: Text('Process Data')));
                   }

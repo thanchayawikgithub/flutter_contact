@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:my_contact/add_contact_widget.dart';
 import 'package:my_contact/contact.dart';
+import 'package:my_contact/contact_provider.dart';
 import 'package:my_contact/edit_contact_widget.dart';
+import 'package:provider/provider.dart';
 
 class ContactWidget extends StatefulWidget {
   const ContactWidget({Key? key}) : super(key: key);
@@ -11,67 +13,65 @@ class ContactWidget extends StatefulWidget {
 }
 
 class _ContactWidgetState extends State<ContactWidget> {
-  List<Contact> contacts = [
-    Contact(
-        id: 1,
-        name: 'Contact1',
-        phone: "0999999999",
-        email: 'contact1@gmail.com'),
-    Contact(
-        id: 2,
-        name: 'Contact2',
-        phone: "0999999992",
-        email: 'contact2@gmail.com'),
-    Contact(
-        id: 3,
-        name: 'Contact3',
-        phone: "0999999993",
-        email: 'contact3@gmail.com'),
-    Contact(
-        id: 4,
-        name: 'Contact4',
-        phone: "0999999994",
-        email: 'contact4@gmail.com'),
-    Contact(
-        id: 5,
-        name: 'Contact5',
-        phone: "0999999995",
-        email: 'contact5@gmail.com')
-  ];
-  int lastId = 6;
-  void addContact(Contact contact) {
-    setState(() {
-      contact.id = lastId;
-      contacts.add(contact);
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<ContactProvider>(
+        builder: (context, contactProvider, child) {
+      return DefaultTabController(
+        length: 3,
+        initialIndex: 1,
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text("My Contact"),
+            bottom: TabBar(tabs: <Widget>[
+              Tab(
+                icon: Icon(Icons.abc),
+              ),
+              Tab(
+                icon: Icon(Icons.abc_outlined),
+              )
+            ]),
+          ),
+          body: TabBarView(
+            children: [
+              ContactListView1(),
+              ContactListView2(),
+            ],
+          ),
+          floatingActionButton: FloatingActionButton(
+            child: Icon(Icons.add),
+            onPressed: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return AddContactWidget();
+              }));
+            },
+          ),
+        ),
+      );
     });
   }
+}
 
-  void editContact(Contact contact, int index) {
-    setState(() {
-      contacts[index] = contact;
-    });
-  }
-
-  void deleteContact(index) {
-    setState(() {
-      contacts.removeAt(index);
-    });
-  }
+class ContactListView1 extends StatelessWidget {
+  const ContactListView1({
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text("My Contact")),
-      body: ListView.builder(
+    return Consumer<ContactProvider>(
+        builder: (context, contactProvider, child) {
+      return ListView.builder(
         itemBuilder: (context, index) {
           return ListTile(
-            leading: CircleAvatar(child: Text(contacts[index].name[0])),
-            title: Text(contacts[index].name),
+            leading:
+                CircleAvatar(child: Text(contactProvider.items[index].name[0])),
+            title: Text(contactProvider.items[index].name),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(contacts[index].phone),
-                Text(contacts[index].email)
+                Text(contactProvider.items[index].phone),
+                Text(contactProvider.items[index].email)
               ],
             ),
             trailing: IconButton(
@@ -92,7 +92,9 @@ class _ContactWidgetState extends State<ContactWidget> {
                               child: Text('Cancel')),
                           TextButton(
                               onPressed: () {
-                                deleteContact(index);
+                                Provider.of<ContactProvider>(context,
+                                        listen: false)
+                                    .deleteContact(index);
                                 Navigator.pop(context);
                               },
                               child: Text('Delete'))
@@ -102,27 +104,84 @@ class _ContactWidgetState extends State<ContactWidget> {
                   );
                 }),
             onTap: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => EditContactWidget(
-                          contact: contacts[index],
-                          editContact: (contact) {
-                            editContact(contact, index);
-                          })));
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                final provider =
+                    Provider.of<ContactProvider>(context, listen: false);
+                provider.setCurrentContact(provider.items[index]);
+                return EditContactWidget();
+              }));
             },
           );
         },
-        itemCount: contacts.length,
-      ),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
-        onPressed: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) {
-            return AddContactWidget(addContact: addContact);
-          }));
+        itemCount: contactProvider.items.length,
+      );
+    });
+  }
+}
+
+class ContactListView2 extends StatelessWidget {
+  const ContactListView2({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<ContactProvider>(
+        builder: (context, contactProvider, child) {
+      return ListView.builder(
+        itemBuilder: (context, index) {
+          return ListTile(
+            leading:
+                CircleAvatar(child: Text(contactProvider.items[index].name[0])),
+            title: Text(contactProvider.items[index].name),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(contactProvider.items[index].phone),
+                Text(contactProvider.items[index].email)
+              ],
+            ),
+            trailing: IconButton(
+                icon: Icon(Icons.delete),
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: Text('Delete Contact'),
+                        content: Text(
+                            'Are you sure you want to delete this contact?'),
+                        actions: [
+                          TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: Text('Cancel')),
+                          TextButton(
+                              onPressed: () {
+                                Provider.of<ContactProvider>(context,
+                                        listen: false)
+                                    .deleteContact(index);
+                                Navigator.pop(context);
+                              },
+                              child: Text('Delete'))
+                        ],
+                      );
+                    },
+                  );
+                }),
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                final provider =
+                    Provider.of<ContactProvider>(context, listen: false);
+                provider.setCurrentContact(provider.items[index]);
+                return EditContactWidget();
+              }));
+            },
+          );
         },
-      ),
-    );
+        itemCount: contactProvider.items.length,
+      );
+    });
   }
 }
