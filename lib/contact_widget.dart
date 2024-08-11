@@ -128,56 +128,18 @@ class ContactListView2 extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<ContactProvider>(
         builder: (context, contactProvider, child) {
-      return ListView.builder(
+      return GridView.builder(
+        gridDelegate:
+            SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
         itemBuilder: (context, index) {
-          return ListTile(
-            leading:
-                CircleAvatar(child: Text(contactProvider.items[index].name[0])),
-            title: Text(contactProvider.items[index].name),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(contactProvider.items[index].phone),
-                Text(contactProvider.items[index].email)
-              ],
+          return Card(
+            color: Colors.deepPurpleAccent,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12.0)),
+            elevation: 8,
+            child: Container(
+              child: Center(),
             ),
-            trailing: IconButton(
-                icon: Icon(Icons.delete),
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) {
-                      return AlertDialog(
-                        title: Text('Delete Contact'),
-                        content: Text(
-                            'Are you sure you want to delete this contact?'),
-                        actions: [
-                          TextButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              child: Text('Cancel')),
-                          TextButton(
-                              onPressed: () {
-                                Provider.of<ContactProvider>(context,
-                                        listen: false)
-                                    .deleteContact(index);
-                                Navigator.pop(context);
-                              },
-                              child: Text('Delete'))
-                        ],
-                      );
-                    },
-                  );
-                }),
-            onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) {
-                final provider =
-                    Provider.of<ContactProvider>(context, listen: false);
-                provider.setCurrentContact(provider.items[index]);
-                return EditContactWidget();
-              }));
-            },
           );
         },
         itemCount: contactProvider.items.length,
