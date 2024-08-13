@@ -127,23 +127,62 @@ class ContactListView2 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<ContactProvider>(
-        builder: (context, contactProvider, child) {
-      return GridView.builder(
-        gridDelegate:
-            SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
-        itemBuilder: (context, index) {
-          return Card(
-            color: Colors.deepPurpleAccent,
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12.0)),
-            elevation: 8,
-            child: Container(
-              child: Center(),
-            ),
-          );
-        },
-        itemCount: contactProvider.items.length,
-      );
-    });
+      builder: (context, contactProvider, child) {
+        return GridView.builder(
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 3, // จำนวนคอลัมน์ในกริด
+            crossAxisSpacing: 8.0, // ระยะห่างระหว่างคอลัมน์
+            mainAxisSpacing: 8.0, // ระยะห่างระหว่างแถว
+          ),
+          itemCount: contactProvider.items.length,
+          itemBuilder: (context, index) {
+            final contact =
+                contactProvider.items[index]; // ดึงข้อมูล Contact ที่ index
+            return Card(
+              color: const Color.fromARGB(255, 42, 22, 5),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12.0),
+              ),
+              elevation: 8,
+              child: Container(
+                padding: EdgeInsets.all(8.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircleAvatar(
+                      child:
+                          Text(contact.name.isNotEmpty ? contact.name[0] : '?'),
+                      backgroundColor: Color(4286731539),
+                      foregroundColor: Color(4294958520),
+                    ),
+                    SizedBox(height: 8.0),
+                    Text(
+                      contact.name,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Color(4292134069),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 4.0),
+                    Text(
+                      contact.phone,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.white70),
+                    ),
+                    SizedBox(height: 4.0),
+                    Text(
+                      contact.email,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.white70),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 }
